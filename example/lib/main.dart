@@ -73,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
             pinInputController: controller,
             onSubmit: () {
               print(controller.text);
+              // controller.clear();
             },
             inputTextColor: Colors.blue,
             inputBorderColor: Colors.blue,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dynamic_pin_keyboard/src/components/dynamic_keyboard.dart';
 import 'package:dynamic_pin_keyboard/src/components/input_widget.dart';
 import 'package:dynamic_pin_keyboard/src/controller.dart';
@@ -119,6 +121,7 @@ class DynamicPinKeyboard extends StatefulWidget {
 }
 
 class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
+  StreamSubscription<void>? _controllerSubscription;
   List<int> inputNumbers = [];
   String inputText = "";
   String errorText = "";
@@ -136,6 +139,10 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
         inputNumbers.add(i);
       }
       setState(() {});
+    });
+
+    _controllerSubscription = widget.pinInputController.clearAction.listen((event) {
+      clearAction();
     });
   }
 
@@ -259,6 +266,14 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
       setState(() {
         inputText = inputText.substring(0, inputText.length - 1);
         widget.pinInputController.changeText(inputText);
+      });
+    }
+  }
+
+  void clearAction() {
+    if (inputText.isNotEmpty) {
+      setState(() {
+        inputText = "";
       });
     }
   }
