@@ -32,6 +32,7 @@ class DynamicKeyboard extends StatelessWidget {
   final VoidCallback onIncompleteInputError;
   final VoidCallback deleteAction;
   final TextStyle? keyboardButtonTextStyle;
+  final UseCase useCase;
   final void Function(String v) onKeyTap;
 
   const DynamicKeyboard({
@@ -66,13 +67,18 @@ class DynamicKeyboard extends StatelessWidget {
     required this.hasBorder,
     this.keyboardButtonTextStyle,
     this.disableUtilityKey = false,
+    this.useCase = UseCase.pin,
   });
 
   VoidCallback get defaultUtilityAction {
-    if (currentInputSize >= inputSize) {
-      return onSubmit;
+    if(useCase == UseCase.pin) {
+      if (currentInputSize >= inputSize) {
+        return onSubmit;
+      } else {
+        return onIncompleteInputError;
+      }
     } else {
-      return onIncompleteInputError;
+      return onSubmit;
     }
   }
 

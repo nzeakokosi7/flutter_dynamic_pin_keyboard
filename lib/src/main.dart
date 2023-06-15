@@ -10,6 +10,8 @@ enum KeyButtonShape { circular, rounded, defaultShape }
 
 enum InputShape { circular, rounded, defaultShape }
 
+enum UseCase { pin, keyboard }
+
 class DynamicPinKeyboard extends StatefulWidget {
   final KeyButtonShape keyboardButtonShape;
   final InputShape inputShape;
@@ -63,6 +65,7 @@ class DynamicPinKeyboard extends StatefulWidget {
   final String? keyboardFontFamily;
   final bool enableKeyboardButtonBorder;
   final bool disableUtilityKey;
+  final UseCase useCase;
 
   const DynamicPinKeyboard({
     super.key,
@@ -114,6 +117,7 @@ class DynamicPinKeyboard extends StatefulWidget {
     this.deleteKeyButtonIcon,
     this.inputUnderlineColor = Colors.black,
     this.disableUtilityKey = false,
+    this.useCase = UseCase.pin,
   });
 
   @override
@@ -141,7 +145,8 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
       setState(() {});
     });
 
-    _controllerSubscription = widget.pinInputController.clearAction.listen((event) {
+    _controllerSubscription =
+        widget.pinInputController.clearAction.listen((event) {
       clearAction();
     });
   }
@@ -151,33 +156,35 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
     Size size = MediaQuery.of(context).size;
     return Column(
       children: [
-        Container(
-          constraints: BoxConstraints(
-            maxWidth: size.width * (widget.inputsMaxWidth / 100),
-          ),
-          child: InputWidget(
-            inputText: inputText,
-            inputShape: widget.inputShape,
-            inputNumbers: inputNumbers,
-            inputHeight: widget.inputHeight,
-            inputWidth: widget.inputWidth,
-            inputFontSize: widget.inputFontSize,
-            inputBorderWidth: widget.inputBorderWidth,
-            inputBorderRadius: widget.inputBorderRadius,
-            inputElevation: widget.inputElevation,
-            inputBorderColour: widget.inputBorderColor,
-            inputUnderlineColour: widget.inputUnderlineColor,
-            inputFillColour: widget.inputFillColor,
-            inputShadowColour: widget.inputShadowColor,
-            inputHasBorder: widget.inputHasBorder,
-            underlineInputs: widget.underlineInputs!,
-            obscureInputs: widget.obscureInputs,
-            obscuringCharacter: widget.obscuringCharacter,
-            obscuringModeDefaultColor: widget.obscuringModeDefaultColor,
-            inputTextColor: widget.inputTextColor,
-            inputTextStyle: widget.inputTextStyle,
-          ),
-        ),
+        widget.useCase == UseCase.pin
+            ? Container(
+                constraints: BoxConstraints(
+                  maxWidth: size.width * (widget.inputsMaxWidth / 100),
+                ),
+                child: InputWidget(
+                  inputText: inputText,
+                  inputShape: widget.inputShape,
+                  inputNumbers: inputNumbers,
+                  inputHeight: widget.inputHeight,
+                  inputWidth: widget.inputWidth,
+                  inputFontSize: widget.inputFontSize,
+                  inputBorderWidth: widget.inputBorderWidth,
+                  inputBorderRadius: widget.inputBorderRadius,
+                  inputElevation: widget.inputElevation,
+                  inputBorderColour: widget.inputBorderColor,
+                  inputUnderlineColour: widget.inputUnderlineColor,
+                  inputFillColour: widget.inputFillColor,
+                  inputShadowColour: widget.inputShadowColor,
+                  inputHasBorder: widget.inputHasBorder,
+                  underlineInputs: widget.underlineInputs!,
+                  obscureInputs: widget.obscureInputs,
+                  obscuringCharacter: widget.obscuringCharacter,
+                  obscuringModeDefaultColor: widget.obscuringModeDefaultColor,
+                  inputTextColor: widget.inputTextColor,
+                  inputTextStyle: widget.inputTextStyle,
+                ),
+              )
+            : const SizedBox(),
         SizedBox(
           height: widget.spacing / 2,
         ),
@@ -227,6 +234,7 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
               deleteKeyButtonFillColour: widget.deleteKeyButtonFillColour,
               deleteKeyButtonIcon: widget.deleteKeyButtonIcon,
               disableUtilityKey: widget.disableUtilityKey,
+              useCase: widget.useCase,
               onIncompleteInputError: onIncompleteInputError,
               onKeyTap: onKeyTap,
               deleteAction: deleteAction,
@@ -238,7 +246,7 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
   }
 
   void onKeyTap(String btnText) {
-    if (inputText.length < widget.pinInputController.length) {
+    if (widget.useCase == UseCase.pin && inputText.length < widget.pinInputController.length) {
       setState(() {
         inputText = inputText + btnText;
         widget.pinInputController.changeText(inputText);
@@ -246,8 +254,15 @@ class _DynamicPinKeyboardState extends State<DynamicPinKeyboard> {
 
         /// textToDisplay = res;
       });
+    } else if(widget.useCase == UseCase.keyboard){
+      setState(() {
+        inputText = inputText + btnText;
+        widget.pinInputController.changeText(inputText);
+        HapticFeedback.vibrate();
+      });
     }
-    if (inputText.length >= widget.pinInputController.length) {
+    if (inputText.length >= widget.pinInputController.length &&
+        widget.useCase == UseCase.pin) {
       widget.onSubmit();
       setState(() {
         errorText = '';

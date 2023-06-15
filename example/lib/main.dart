@@ -35,6 +35,17 @@ class _MyHomePageState extends State<MyHomePage> {
   DynamicInputController controller = DynamicInputController(length: 4);
 
   @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(
+      () {
+        debugPrint(controller.text);
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
@@ -72,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
             inputFontSize: 30,
             pinInputController: controller,
             onSubmit: () {
-              print(controller.text);
+              debugPrint(controller.text);
               // controller.clear();
             },
             inputTextColor: Colors.blue,
@@ -81,13 +92,13 @@ class _MyHomePageState extends State<MyHomePage> {
             obscureInputs: true,
             keyboardButtonShape: KeyButtonShape.circular,
             keyboardButtonTextStyle: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF181818)
-            ),
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF181818)),
             inputHasBorder: false,
             // extraInput: "Fuck",
-            disableUtilityKey: true,
+            useCase: UseCase.keyboard,
+            disableUtilityKey: false,
             deleteButton: SvgPicture.asset("assets/delete_icon.svg"),
             // utilityKeyButton: const SizedBox(),
           )
